@@ -19,8 +19,9 @@ const UserDropDown = ({ user }: { user: User }) => {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/sign-in");
+    const result = await signOut();
+    if (result?.success === false) return;
+    router.push('/sign-in');
   }
 
   return (

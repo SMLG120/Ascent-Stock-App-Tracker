@@ -4,6 +4,21 @@ import { auth } from "@/lib/better-auth/auth";
 import { inngest } from "@/lib/inngest/client";
 import { headers } from "next/headers";
 
+interface SignUpFormData {
+    email: string;
+    password: string;
+    fullName: string;
+    country: string;
+    investmentGoals: string;
+    riskTolerance: string;
+    preferredIndustry: string;
+}
+
+interface SignInFormData {
+    email: string;
+    password: string;
+}
+
 export const signUpWithEmail = async ({ email, password, fullName, country, investmentGoals, riskTolerance, preferredIndustry }: SignUpFormData) => {
     try {
         const response = await auth.api.signUpEmail({
