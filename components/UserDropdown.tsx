@@ -13,15 +13,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
 import { LogOut } from "lucide-react"
 import NavItems from "./NavItems"
+import { signOut } from "@/lib/actions/auth_actions"
 
-const UserDropDown = () => {
+const UserDropDown = ({ user }: { user: User }) => {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    router.push("/sign-in");
+    const result = await signOut();
+    if (result?.success === false) return;
+    router.push('/sign-in');
   }
 
-  const user = { name: "John Doe", email: 'john.doe@example.com' }; // Replace with actual user data fetching logic
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -48,7 +50,7 @@ const UserDropDown = () => {
                 {user.name[0]}
               </AvatarFallback>
             </Avatar>
-            <div className="hflex flex-col">
+            <div className="flex flex-col">
               <span className='text-base font-medium text-gray-400'>
                 {user.name}
               </span>
@@ -59,11 +61,11 @@ const UserDropDown = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className=" bg-gray-600" />
-          <DropdownMenuItem onClick={handleSignOut} className=" text-gray-100 text-md font medium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer">
-            <LogOut className="h-4 w-4 mr-2 hidden sm:block" />
-            Logout
-          </DropdownMenuItem>
-        <DropdownMenuSeparator className="hidden sm:block bg-gray-600"/>
+        <DropdownMenuItem onClick={handleSignOut} className=" text-gray-100 text-md font medium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer">
+          <LogOut className="h-4 w-4 mr-2 hidden sm:block" />
+          Logout
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="hidden sm:block bg-gray-600" />
         <nav className="sm:hidden">
           <NavItems />
         </nav>
