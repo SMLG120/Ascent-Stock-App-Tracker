@@ -8,13 +8,13 @@ const NavItems = ({ initialStocks }: { initialStocks: StockWithWatchlistStatus[]
     const pathname = usePathname();
 
     const isActive = (path: string) => {
-        if (path === '/search') return pathname === '/';
+        if (path === '/') return pathname === '/';
         return pathname.startsWith(path);
     }
     return (
         <ul className="flex flex-col sm:flex-row p-2 gap-3 sm:gap-10 font-medium">
             {NAV_ITEMS.map(({ href, label }) => {
-                if (label === 'Search') return (
+                if (label === '/search') return (
                     <li key="search-trigger">
                         <SearchCommand
                             renderAs="text"
