@@ -55,7 +55,7 @@ export default async function StockDetails({ params }: StockDetailsPageProps) {
           <div className="flex items-center justify-between">
             <WatchlistButton
               symbol={symbol.toUpperCase()}
-              company={symbol.toUpperCase()}
+              company={stockData.company}
               isInWatchlist={isInWatchlist}
               type='button'
             />

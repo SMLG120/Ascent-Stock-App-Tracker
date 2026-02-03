@@ -2,7 +2,7 @@
 import { useDebounce } from "@/hooks/useDebounce";
 import { addToWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist.actions";
 import { Star, Trash2, StarIcon, Stars } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { toast } from 'sonner';
 // Minimal WatchlistButton implementation to satisfy page requirements.
 // This component focuses on UI contract only. It toggles local state and
@@ -17,25 +17,40 @@ export const WatchlistButton = ({
   onWatchlistChange,
 }: WatchlistButtonProps) => {
   const [added, setAdded] = useState<boolean>(!!isInWatchlist);
+  const [isPending, setIsPending] = useState(false);
 
   const label = useMemo(() => {
     if (type === "icon") return added ? "" : "";
     return added ? "Remove from Watchlist" : "Add to Watchlist";
   }, [added, type]);
 
-  // handl adding/removing stocks from watchlist
-  const toggleWatchlist = async () => {
-    const result = added ? await removeFromWatchlist(symbol) : await addToWatchlist(symbol, company);
+  // Handle adding/removing stocks from watchlist
+  const toggleWatchlist = useCallback(async () => {
+    const wasAdded = added;
+    setIsPending(true);
+    try {
+      const result = wasAdded
+        ? await removeFromWatchlist(symbol)
+        : await addToWatchlist(symbol, company);
 
-    if (result.success) {
-      toast.success(added ? 'Removed from Watchlist' : 'Added to Watchlist', {
-        description: `${company} ${added ? 'removed from' : 'added to'
-          } your watchlist`,
-      });
-      // Notify parent component of watchlist change for state synchronization
-      onWatchlistChange?.(symbol, !added);
+      if (result.success) {
+        toast.success(wasAdded ? 'Removed from Watchlist' : 'Added to Watchlist', {
+          description: `${company} ${wasAdded ? 'removed from' : 'added to'} your watchlist`,
+        });
+        onWatchlistChange?.(symbol, !wasAdded);
+      } else {
+        // Revert optimistic update on failure
+        setAdded(wasAdded);
+        toast.error('Action failed', { description: result.message || 'Please try again' });
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setAdded(wasAdded);
+      toast.error('Something went wrong', { description: 'Please try again' });
+    } finally {
+      setIsPending(false);
     }
-  };
+  }, [added, symbol, company, onWatchlistChange]);
   // Debounce the toggle function to prevent rapid API calls (300ms delay)
   const debouncedToggle = useDebounce(toggleWatchlist, 300);
 
@@ -44,6 +59,7 @@ export const WatchlistButton = ({
     e.stopPropagation();
     e.preventDefault();
 
+    if (isPending) return;
     setAdded(!added);
     debouncedToggle();
   }
