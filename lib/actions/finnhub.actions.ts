@@ -226,7 +226,7 @@ export const getStocksDetails = cache(async (symbol: string) => {
       throw new Error('Invalid stock data received from API');
 
     const changePercent = quoteData.dp || 0;
-    const peRatio = financialsData?.metric?.peNormalizeAnnual || null;
+    const peRatio = financialsData?.metric?.peNormalizedAnnual || null;
 
     return {
       symbol: cleanSymbol,
@@ -235,7 +235,7 @@ export const getStocksDetails = cache(async (symbol: string) => {
       changePercent,
       priceFormatted: formatPrice(quoteData.c),
       changeFormatted: formatChangePercent(changePercent),
-      peRatio: peRatio?.toFixed(1) || '-',
+      peRatio: peRatio?.toFixed(1) || '—',
       marketCapFormatted: formatMarketCapValue(
         profileData?.marketCapitalization || 0
       ),
